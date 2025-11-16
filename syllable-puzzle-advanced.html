@@ -357,6 +357,179 @@
       display: block;
     }
 
+    .config-screen {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      z-index: 1001;
+      max-width: 500px;
+      width: 90%;
+      display: none;
+    }
+
+    .config-screen.show {
+      display: block;
+    }
+
+    .config-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .config-section {
+      margin-bottom: 2rem;
+    }
+
+    .config-label {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.75rem;
+    }
+
+    .time-options, .difficulty-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .option-btn {
+      padding: 0.85rem 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: 2px solid #ddd;
+      background: white;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .option-btn:hover {
+      border-color: #f9ca24;
+      background: #fffbf0;
+    }
+
+    .option-btn.selected {
+      background: #f9ca24;
+      color: white;
+      border-color: #f9ca24;
+      box-shadow: 0 4px 8px rgba(249, 202, 36, 0.3);
+    }
+
+    .difficulty-option {
+      padding: 1rem;
+      border: 2px solid #ddd;
+      background: white;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .difficulty-option:hover {
+      border-color: #f9ca24;
+      background: #fffbf0;
+    }
+
+    .difficulty-option.selected {
+      border-color: #f9ca24;
+      box-shadow: 0 4px 8px rgba(249, 202, 36, 0.3);
+    }
+
+    .difficulty-option.easy.selected {
+      background: #2ecc71;
+      color: white;
+      border-color: #2ecc71;
+    }
+
+    .difficulty-option.medium.selected {
+      background: #f39c12;
+      color: white;
+      border-color: #f39c12;
+    }
+
+    .difficulty-option.hard.selected {
+      background: #e67e22;
+      color: white;
+      border-color: #e67e22;
+    }
+
+    .difficulty-option.advanced.selected {
+      background: #e74c3c;
+      color: white;
+      border-color: #e74c3c;
+    }
+
+    .difficulty-name {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .difficulty-details {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+      line-height: 1.4;
+    }
+
+    .difficulty-option.selected .difficulty-details {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .btn-start-game {
+      width: 100%;
+      padding: 1.2rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #f9ca24 0%, #f0b90b 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 6px 12px rgba(249, 202, 36, 0.3);
+      margin-top: 1rem;
+    }
+
+    .btn-start-game:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(249, 202, 36, 0.4);
+    }
+
+    .btn-start-game:active {
+      transform: translateY(0);
+    }
+
+    .game-container.hidden {
+      display: none;
+    }
+
+    .difficulty-badge.easy {
+      background: #2ecc71;
+    }
+
+    .difficulty-badge.medium {
+      background: #f39c12;
+    }
+
+    .difficulty-badge.hard {
+      background: #e67e22;
+    }
+
+    .difficulty-badge.advanced {
+      background: #e74c3c;
+    }
+
     .hint-display {
       background: #fff3cd;
       border: 2px solid #f9ca24;
@@ -420,14 +593,53 @@
 </head>
 <body>
   <div class="overlay" id="overlay"></div>
-  
+
+  <div class="config-screen show" id="configScreen">
+    <h1 class="config-title">🧩 Syllable Puzzle</h1>
+
+    <div class="config-section">
+      <label class="config-label">Select Time Limit:</label>
+      <div class="time-options">
+        <button class="option-btn" onclick="selectTime(120, this)">2 min</button>
+        <button class="option-btn" onclick="selectTime(180, this)">3 min</button>
+        <button class="option-btn selected" onclick="selectTime(300, this)">5 min</button>
+        <button class="option-btn" onclick="selectTime(420, this)">7 min</button>
+        <button class="option-btn" onclick="selectTime(600, this)">10 min</button>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <label class="config-label">Select Difficulty:</label>
+      <div class="difficulty-options">
+        <div class="difficulty-option easy" onclick="selectDifficulty('easy', this)">
+          <div class="difficulty-name">Easy</div>
+          <div class="difficulty-details">3 words • 30% decoys • 4 hints</div>
+        </div>
+        <div class="difficulty-option medium" onclick="selectDifficulty('medium', this)">
+          <div class="difficulty-name">Medium</div>
+          <div class="difficulty-details">4 words • 45% decoys • 3 hints</div>
+        </div>
+        <div class="difficulty-option hard" onclick="selectDifficulty('hard', this)">
+          <div class="difficulty-name">Hard</div>
+          <div class="difficulty-details">5 words • 60% decoys • 2 hints</div>
+        </div>
+        <div class="difficulty-option advanced selected" onclick="selectDifficulty('advanced', this)">
+          <div class="difficulty-name">Advanced</div>
+          <div class="difficulty-details">6 words • 75% decoys • 2 hints</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-start-game" onclick="startGameWithConfig()">Start Game</button>
+  </div>
+
   <div class="feedback" id="feedback">
     <div class="feedback-icon" id="feedbackIcon">✓</div>
     <div class="feedback-message" id="feedbackMessage">Correct!</div>
     <div class="feedback-points" id="feedbackPoints">+100 points</div>
   </div>
 
-  <div class="game-container">
+  <div class="game-container hidden">
     <div class="game-header">
       <div>
         <span class="game-title">🧩 Syllable Puzzle</span>
@@ -474,6 +686,106 @@
   </div>
 
   <script>
+    // Game configuration
+    let gameConfig = {
+      timeLimit: 300,         // 5 minutes default
+      difficulty: 'advanced',  // advanced default
+      maxHints: 2,
+      decoyPercentage: 0.75,
+      wordCount: 6,
+      timeBonusMultiplier: 1.0
+    };
+
+    // Difficulty presets
+    const difficultyPresets = {
+      easy: {
+        maxHints: 4,
+        decoyPercentage: 0.30,
+        wordCount: 3,
+        timeBonusMultiplier: 1.5,
+        minSyllables: 3,
+        maxSyllables: 4
+      },
+      medium: {
+        maxHints: 3,
+        decoyPercentage: 0.45,
+        wordCount: 4,
+        timeBonusMultiplier: 1.2,
+        minSyllables: 3,
+        maxSyllables: 5
+      },
+      hard: {
+        maxHints: 2,
+        decoyPercentage: 0.60,
+        wordCount: 5,
+        timeBonusMultiplier: 1.0,
+        minSyllables: 4,
+        maxSyllables: 6
+      },
+      advanced: {
+        maxHints: 2,
+        decoyPercentage: 0.75,
+        wordCount: 6,
+        timeBonusMultiplier: 1.0,
+        minSyllables: 5,
+        maxSyllables: 15
+      }
+    };
+
+    // Configuration functions
+    function selectTime(seconds, clickedElement) {
+      gameConfig.timeLimit = seconds;
+
+      // Update UI
+      document.querySelectorAll('.time-options .option-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+
+      // Handle both direct calls and event-based calls
+      const target = clickedElement || window.event.target;
+      target.classList.add('selected');
+    }
+
+    function selectDifficulty(difficulty, clickedElement) {
+      gameConfig.difficulty = difficulty;
+      const preset = difficultyPresets[difficulty];
+      gameConfig.maxHints = preset.maxHints;
+      gameConfig.decoyPercentage = preset.decoyPercentage;
+      gameConfig.wordCount = preset.wordCount;
+      gameConfig.timeBonusMultiplier = preset.timeBonusMultiplier;
+
+      // Update UI
+      document.querySelectorAll('.difficulty-option').forEach(opt => {
+        opt.classList.remove('selected');
+      });
+
+      // Handle both direct calls and event-based calls
+      const target = clickedElement || window.event.target;
+      const optionDiv = target.closest('.difficulty-option');
+      if (optionDiv) {
+        optionDiv.classList.add('selected');
+      }
+    }
+
+    function startGameWithConfig() {
+      // Hide config screen
+      document.getElementById('configScreen').classList.remove('show');
+      document.querySelector('.game-container').classList.remove('hidden');
+
+      // Update difficulty badge
+      const badge = document.querySelector('.difficulty-badge');
+      badge.textContent = gameConfig.difficulty.toUpperCase();
+      badge.className = 'difficulty-badge ' + gameConfig.difficulty;
+
+      // Start the game
+      initializeGame();
+    }
+
+    function showConfigScreen() {
+      document.getElementById('configScreen').classList.add('show');
+      document.querySelector('.game-container').classList.add('hidden');
+    }
+
     // Enhanced syllable splitting function
     function syllabify(word) {
       const regex = /[^aeiouy]*[aeiouy]+(?:[^aeiouy]*$|[^aeiouy](?=[^aeiouy]))?/gi;
@@ -557,9 +869,22 @@
 
     // Generate a new puzzle
     function generatePuzzle() {
-      // Select 5 random words
-      const shuffled = [...wordDatabase].sort(() => Math.random() - 0.5);
-      currentPuzzle = shuffled.slice(0, 5).map((item, index) => ({
+      // Filter words based on difficulty
+      const preset = difficultyPresets[gameConfig.difficulty];
+      let filteredWords = wordDatabase.filter(item => {
+        const syllables = syllabify(item.word);
+        const syllableCount = syllables.length;
+        return syllableCount >= preset.minSyllables && syllableCount <= preset.maxSyllables;
+      });
+
+      // Ensure we have enough words
+      if (filteredWords.length < gameConfig.wordCount) {
+        filteredWords = [...wordDatabase];
+      }
+
+      // Select random words based on difficulty
+      const shuffled = [...filteredWords].sort(() => Math.random() - 0.5);
+      currentPuzzle = shuffled.slice(0, gameConfig.wordCount).map((item, index) => ({
         ...item,
         id: index,
         syllables: syllabify(item.word),
@@ -587,9 +912,9 @@
         'ent', 'ence', 'ance', 'ity', 'ty', 'cy', 'dom', 'er', 'or', 'ist',
         'ism', 'ate', 'ify', 'ize', 'ise', 'en', 'em', 'non', 'mid', 'mega'
       ];
-      
-      // Add 50-60% decoys to make it harder
-      const numDecoys = Math.min(25, Math.floor(allSyllables.length * 0.6));
+
+      // Add decoys based on difficulty percentage
+      const numDecoys = Math.min(30, Math.floor(allSyllables.length * gameConfig.decoyPercentage));
       const usedDecoys = new Set();
       
       for (let i = 0; i < numDecoys; i++) {
@@ -711,7 +1036,7 @@
         // Calculate points (higher for complex words)
         const basePoints = 150;
         const syllableBonus = selectedSyllables.length * 20;
-        const timeBonus = Math.floor(timeLeft / 8);
+        const timeBonus = Math.floor((timeLeft / 8) * gameConfig.timeBonusMultiplier);
         const hintPenalty = hintsUsed * 15;
         const totalPoints = basePoints + syllableBonus + timeBonus - hintPenalty;
 
@@ -767,7 +1092,7 @@
 
     // Show hint (more limited for difficulty)
     function showHint() {
-      if (hintsUsed >= 2) {
+      if (hintsUsed >= gameConfig.maxHints) {
         alert('No more hints available!');
         return;
       }
@@ -865,11 +1190,17 @@
       alert(message);
     }
 
-    // New game
+    // New game - show config screen
     function newGame() {
       clearInterval(timerInterval);
+      showConfigScreen();
+    }
+
+    // Initialize the game with current config
+    function initializeGame() {
+      clearInterval(timerInterval);
       score = 0;
-      timeLeft = 300;
+      timeLeft = gameConfig.timeLimit;
       hintsUsed = 0;
       document.getElementById('score').textContent = score;
       updateTimerDisplay();
@@ -877,10 +1208,10 @@
       startTimer();
     }
 
-    // Initialize game on page load
+    // Initialize game on page load - show config screen
     window.onload = function() {
-      generatePuzzle();
-      startTimer();
+      // Config screen is already shown by default in HTML
+      // Do nothing - wait for user to click Start Game
     };
   </script>
 </body>
