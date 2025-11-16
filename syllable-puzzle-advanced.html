@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syllable Puzzle - Advanced</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .game-container {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 3px solid #f9ca24;
+    }
+
+    .game-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .difficulty-badge {
+      background: #e74c3c;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-left: 1rem;
+    }
+
+    .stats {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #f9ca24;
+    }
+
+    .timer-warning {
+      color: #e74c3c !important;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .clues-section {
+      background: #fff9e6;
+      padding: 1.5rem;
+      border-radius: 15px;
+      margin-bottom: 2rem;
+      border: 2px solid #f9ca24;
+    }
+
+    .clues-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .clue-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: white;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .clue-item.solved {
+      background: #d5f4e6;
+      border-left: 4px solid #2ecc71;
+    }
+
+    .clue-number {
+      background: #f9ca24;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+
+    .clue-item.solved .clue-number {
+      background: #2ecc71;
+    }
+
+    .clue-content {
+      flex: 1;
+    }
+
+    .clue-text {
+      color: #2c3e50;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .clue-answer {
+      margin-top: 0.5rem;
+      font-weight: bold;
+      color: #2ecc71;
+      font-size: 1.1rem;
+    }
+
+    .answer-display {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 15px;
+      margin-bottom: 1.5rem;
+      border: 3px dashed #f9ca24;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .selected-syllables {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .selected-syllable {
+      background: #f9ca24;
+      color: white;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      animation: slideIn 0.3s;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .selected-syllable:hover {
+      background: #e1b12c;
+      transform: scale(1.05);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .placeholder-text {
+      color: #bdc3c7;
+      font-style: italic;
+      font-size: 1.1rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.85rem 1.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .btn-clear {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .btn-hint {
+      background: #f39c12;
+      color: white;
+    }
+
+    .btn-shuffle {
+      background: #3498db;
+      color: white;
+    }
+
+    .btn-sort {
+      background: #9b59b6;
+      color: white;
+    }
+
+    .btn-submit {
+      background: #2ecc71;
+      color: white;
+      font-size: 1.1rem;
+    }
+
+    .btn-new-game {
+      background: #34495e;
+      color: white;
+    }
+
+    .syllable-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      padding: 2rem;
+      background: #f8f9fa;
+      border-radius: 15px;
+      min-height: 250px;
+    }
+
+    .syllable {
+      background: linear-gradient(135deg, #f9ca24 0%, #f0b90b 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: bold;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(249, 202, 36, 0.3);
+      user-select: none;
+    }
+
+    .syllable:hover {
+      background: linear-gradient(135deg, #e1b12c 0%, #d4a00a 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 12px rgba(249, 202, 36, 0.4);
+    }
+
+    .syllable.used {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: scale(0.95);
+    }
+
+    .syllable.used:hover {
+      transform: scale(0.95);
+    }
+
+    .feedback {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: white;
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      z-index: 1000;
+      transition: all 0.4s;
+    }
+
+    .feedback.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .feedback-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .feedback-message {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+
+    .feedback-points {
+      font-size: 1.2rem;
+      color: #f9ca24;
+      font-weight: bold;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+
+    .overlay.show {
+      display: block;
+    }
+
+    .hint-display {
+      background: #fff3cd;
+      border: 2px solid #f9ca24;
+      color: #856404;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-style: italic;
+      display: none;
+    }
+
+    .hint-display.show {
+      display: block;
+      animation: slideDown 0.4s;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 1.5rem;
+      }
+
+      .game-title {
+        font-size: 1.5rem;
+      }
+
+      .stats {
+        gap: 1rem;
+      }
+
+      .stat-value {
+        font-size: 1.4rem;
+      }
+
+      .syllable {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+      }
+
+      .controls {
+        gap: 0.5rem;
+      }
+
+      button {
+        padding: 0.65rem 1.25rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay" id="overlay"></div>
+  
+  <div class="feedback" id="feedback">
+    <div class="feedback-icon" id="feedbackIcon">✓</div>
+    <div class="feedback-message" id="feedbackMessage">Correct!</div>
+    <div class="feedback-points" id="feedbackPoints">+100 points</div>
+  </div>
+
+  <div class="game-container">
+    <div class="game-header">
+      <div>
+        <span class="game-title">🧩 Syllable Puzzle</span>
+        <span class="difficulty-badge">ADVANCED</span>
+      </div>
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-label">Score</div>
+          <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Time</div>
+          <div class="stat-value" id="timer">5:00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint-display" id="hintDisplay"></div>
+
+    <div class="clues-section">
+      <div class="clues-title">Decipher these cryptic clues:</div>
+      <div id="cluesList"></div>
+    </div>
+
+    <div class="answer-display">
+      <div class="selected-syllables" id="selectedSyllables">
+        <div class="placeholder-text">Click syllables below to form words</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-clear" onclick="clearSelection()">Clear</button>
+      <button class="btn-hint" onclick="showHint()">Hint (-15 pts)</button>
+      <button class="btn-shuffle" onclick="shuffleSyllables()">Shuffle</button>
+      <button class="btn-sort" onclick="sortSyllables()">Sort A-Z</button>
+      <button class="btn-submit" onclick="submitAnswer()">Submit Answer</button>
+    </div>
+
+    <div class="syllable-pool" id="syllablePool"></div>
+
+    <div style="text-align: center; margin-top: 1.5rem;">
+      <button class="btn-new-game" onclick="newGame()">New Puzzle</button>
+    </div>
+  </div>
+
+  <script>
+    // Enhanced syllable splitting function
+    function syllabify(word) {
+      const regex = /[^aeiouy]*[aeiouy]+(?:[^aeiouy]*$|[^aeiouy](?=[^aeiouy]))?/gi;
+      const result = word.toLowerCase().match(regex);
+      
+      // Handle special cases for complex words
+      if (!result || result.length === 1) {
+        // Try alternative splitting for compound words
+        const altRegex = /.{2,4}/g;
+        return word.toLowerCase().match(altRegex) || [word.toLowerCase()];
+      }
+      
+      return result;
+    }
+
+    // Advanced word database with cryptic clues
+    const wordDatabase = [
+      // 4+ syllable words with complex meanings
+      { word: 'serendipity', clue: 'The faculty of making fortunate discoveries by accident' },
+      { word: 'perspicacious', clue: 'Having keen mental perception and understanding' },
+      { word: 'obstreperous', clue: 'Resisting control in a noisy and difficult manner' },
+      { word: 'pusillanimous', clue: 'Showing a lack of courage or determination' },
+      { word: 'sesquipedalian', clue: 'Characterized by the use of long words' },
+      { word: 'peripatetic', clue: 'Traveling from place to place, especially working' },
+      { word: 'verisimilitude', clue: 'The appearance of being true or real' },
+      { word: 'antediluvian', clue: 'Extremely old-fashioned or antiquated' },
+      { word: 'perspicuous', clue: 'Clearly expressed and easily understood' },
+      { word: 'magnanimous', clue: 'Generous in forgiving an insult or injury' },
+      { word: 'mellifluous', clue: 'Sweet or musical; pleasant to hear' },
+      { word: 'surreptitious', clue: 'Kept secret, especially because improper' },
+      { word: 'perfidious', clue: 'Deceitful and untrustworthy' },
+      { word: 'obsequious', clue: 'Obedient or attentive to an excessive degree' },
+      { word: 'loquacious', clue: 'Tending to talk a great deal' },
+      { word: 'pulchritudinous', clue: 'Physically beautiful (used ironically)' },
+      { word: 'sanctimonious', clue: 'Making a show of being morally superior' },
+      { word: 'supercilious', clue: 'Behaving as though one thinks one is superior' },
+      { word: 'ostentatious', clue: 'Characterized by vulgar or pretentious display' },
+      { word: 'parsimonious', clue: 'Extremely frugal; unwilling to spend' },
+      { word: 'multifarious', clue: 'Many and of various types' },
+      { word: 'inefficacious', clue: 'Not producing the desired effect' },
+      { word: 'grandiloquent', clue: 'Pompous or extravagant in language' },
+      { word: 'tergiversation', clue: 'Evasion of straightforward action or clear-cut statement' },
+      { word: 'defenestration', clue: 'The act of throwing someone out of a window' },
+      { word: 'circumlocution', clue: 'The use of many words where fewer would do' },
+      { word: 'machiavellian', clue: 'Cunning, scheming, and unscrupulous in politics' },
+      { word: 'hippopotamus', clue: 'Large thick-skinned semiaquatic African mammal' },
+      { word: 'equilibrium', clue: 'A state of physical balance or mental calm' },
+      { word: 'ambidextrous', clue: 'Able to use both hands equally well' },
+      { word: 'metamorphosis', clue: 'A complete change of form or nature' },
+      { word: 'pandemonium', clue: 'Wild and noisy disorder or confusion' },
+      { word: 'onomatopoeia', clue: 'Formation of words from sounds associated with them' },
+      { word: 'dichotomous', clue: 'Divided or dividing into two parts' },
+      { word: 'ephemeral', clue: 'Lasting for a very short time' },
+      { word: 'ubiquitous', clue: 'Present, appearing, or found everywhere' },
+      { word: 'capricious', clue: 'Given to sudden changes of mood or behavior' },
+      { word: 'facetious', clue: 'Treating serious issues with inappropriate humor' },
+      { word: 'gregarious', clue: 'Fond of company; sociable' },
+      { word: 'innocuous', clue: 'Not harmful or offensive' },
+      { word: 'meticulous', clue: 'Showing great attention to detail' },
+      { word: 'nefarious', clue: 'Wicked or criminal' },
+      { word: 'querulous', clue: 'Complaining in a petulant or whining manner' },
+      { word: 'recalcitrant', clue: 'Having an obstinately uncooperative attitude' },
+      { word: 'sagacious', clue: 'Having or showing keen mental discernment' },
+      { word: 'tenacious', clue: 'Not readily letting go of or giving up' },
+      { word: 'voracious', clue: 'Wanting or devouring great quantities' },
+      { word: 'xenophobia', clue: 'Dislike or prejudice against people from other countries' },
+      { word: 'zeitgeist', clue: 'The defining spirit or mood of a particular period' },
+      { word: 'cacophonous', clue: 'Involving harsh, discordant mixture of sounds' }
+    ];
+
+    // Game state
+    let currentPuzzle = [];
+    let allSyllables = [];
+    let selectedSyllables = [];
+    let usedSyllableIndices = new Set();
+    let score = 0;
+    let timeLeft = 300; // 5 minutes in seconds
+    let timerInterval;
+    let hintsUsed = 0;
+    let solvedWords = new Set();
+
+    // Generate a new puzzle
+    function generatePuzzle() {
+      // Select 5 random words
+      const shuffled = [...wordDatabase].sort(() => Math.random() - 0.5);
+      currentPuzzle = shuffled.slice(0, 5).map((item, index) => ({
+        ...item,
+        id: index,
+        syllables: syllabify(item.word),
+        solved: false
+      }));
+
+      // Collect all syllables
+      allSyllables = [];
+      currentPuzzle.forEach(word => {
+        word.syllables.forEach((syl, idx) => {
+          allSyllables.push({
+            text: syl,
+            wordId: word.id,
+            syllableIndex: idx
+          });
+        });
+      });
+
+      // Add more sophisticated decoy syllables
+      const decoySyllables = [
+        'pre', 'pro', 'con', 'dis', 'mis', 'un', 'in', 'ex', 'sub', 'super',
+        'trans', 'inter', 'over', 'under', 'anti', 'semi', 'mono', 'bi', 'tri',
+        'tion', 'sion', 'ness', 'ment', 'ful', 'less', 'able', 'ible', 'ous',
+        'ious', 'eous', 'ive', 'ative', 'itive', 'al', 'ial', 'ual', 'ant',
+        'ent', 'ence', 'ance', 'ity', 'ty', 'cy', 'dom', 'er', 'or', 'ist',
+        'ism', 'ate', 'ify', 'ize', 'ise', 'en', 'em', 'non', 'mid', 'mega'
+      ];
+      
+      // Add 50-60% decoys to make it harder
+      const numDecoys = Math.min(25, Math.floor(allSyllables.length * 0.6));
+      const usedDecoys = new Set();
+      
+      for (let i = 0; i < numDecoys; i++) {
+        let decoy;
+        do {
+          decoy = decoySyllables[Math.floor(Math.random() * decoySyllables.length)];
+        } while (usedDecoys.has(decoy));
+        
+        usedDecoys.add(decoy);
+        allSyllables.push({ text: decoy, wordId: -1, syllableIndex: -1 });
+      }
+
+      // Shuffle syllables thoroughly
+      for (let i = 0; i < 5; i++) {
+        allSyllables.sort(() => Math.random() - 0.5);
+      }
+
+      // Reset game state
+      selectedSyllables = [];
+      usedSyllableIndices = new Set();
+      solvedWords = new Set();
+      hintsUsed = 0;
+
+      // Render
+      renderClues();
+      renderSyllables();
+      updateAnswerDisplay();
+    }
+
+    // Render clues
+    function renderClues() {
+      const cluesList = document.getElementById('cluesList');
+      cluesList.innerHTML = currentPuzzle.map(word => `
+        <div class="clue-item ${word.solved ? 'solved' : ''}" id="clue-${word.id}">
+          <div class="clue-number">${word.id + 1}</div>
+          <div class="clue-content">
+            <div class="clue-text">${word.clue}</div>
+            ${word.solved ? `<div class="clue-answer">✓ ${word.word.toUpperCase()}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render syllables
+    function renderSyllables() {
+      const pool = document.getElementById('syllablePool');
+      pool.innerHTML = allSyllables.map((syl, idx) => `
+        <div class="syllable ${usedSyllableIndices.has(idx) ? 'used' : ''}" 
+             data-index="${idx}"
+             onclick="selectSyllable(${idx})">
+          ${syl.text}
+        </div>
+      `).join('');
+    }
+
+    // Select a syllable
+    function selectSyllable(index) {
+      if (usedSyllableIndices.has(index)) return;
+
+      const syllable = allSyllables[index];
+      selectedSyllables.push({ ...syllable, poolIndex: index });
+      usedSyllableIndices.add(index);
+
+      renderSyllables();
+      updateAnswerDisplay();
+    }
+
+    // Update answer display
+    function updateAnswerDisplay() {
+      const display = document.getElementById('selectedSyllables');
+      
+      if (selectedSyllables.length === 0) {
+        display.innerHTML = '<div class="placeholder-text">Click syllables below to form words</div>';
+      } else {
+        display.innerHTML = selectedSyllables.map((syl, idx) => `
+          <div class="selected-syllable" onclick="removeSyllable(${idx})">${syl.text}</div>
+        `).join('');
+      }
+    }
+
+    // Remove a selected syllable
+    function removeSyllable(index) {
+      const syllable = selectedSyllables[index];
+      usedSyllableIndices.delete(syllable.poolIndex);
+      selectedSyllables.splice(index, 1);
+
+      renderSyllables();
+      updateAnswerDisplay();
+    }
+
+    // Clear selection
+    function clearSelection() {
+      selectedSyllables = [];
+      usedSyllableIndices = new Set();
+      renderSyllables();
+      updateAnswerDisplay();
+      hideHint();
+    }
+
+    // Submit answer
+    function submitAnswer() {
+      if (selectedSyllables.length === 0) {
+        showFeedback(false, 'Please select some syllables first!', 0);
+        return;
+      }
+
+      const formedWord = selectedSyllables.map(s => s.text).join('');
+      
+      // Check if it matches any unsolved word
+      const matchedWord = currentPuzzle.find(w => 
+        !w.solved && w.word.toLowerCase() === formedWord.toLowerCase()
+      );
+
+      if (matchedWord) {
+        // Correct answer!
+        matchedWord.solved = true;
+        solvedWords.add(matchedWord.id);
+
+        // Calculate points (higher for complex words)
+        const basePoints = 150;
+        const syllableBonus = selectedSyllables.length * 20;
+        const timeBonus = Math.floor(timeLeft / 8);
+        const hintPenalty = hintsUsed * 15;
+        const totalPoints = basePoints + syllableBonus + timeBonus - hintPenalty;
+
+        score += totalPoints;
+        document.getElementById('score').textContent = score;
+
+        showFeedback(true, `Correct! "${matchedWord.word.toUpperCase()}"`, totalPoints);
+
+        // Remove used syllables from pool permanently
+        allSyllables = allSyllables.filter((_, idx) => !usedSyllableIndices.has(idx));
+        
+        clearSelection();
+        renderClues();
+        renderSyllables();
+
+        // Check if puzzle is complete
+        if (solvedWords.size === currentPuzzle.length) {
+          setTimeout(() => {
+            alert(`🎉 Puzzle Complete! Total Score: ${score}\n\nStarting new puzzle...`);
+            newGame();
+          }, 1500);
+        }
+      } else {
+        // Wrong answer
+        score = Math.max(0, score - 20);
+        document.getElementById('score').textContent = score;
+        showFeedback(false, `"${formedWord}" is not a match. Try again!`, -20);
+        clearSelection();
+      }
+    }
+
+    // Show feedback
+    function showFeedback(isCorrect, message, points) {
+      const feedback = document.getElementById('feedback');
+      const overlay = document.getElementById('overlay');
+      const icon = document.getElementById('feedbackIcon');
+      const messageEl = document.getElementById('feedbackMessage');
+      const pointsEl = document.getElementById('feedbackPoints');
+
+      icon.textContent = isCorrect ? '✓' : '✗';
+      icon.style.color = isCorrect ? '#2ecc71' : '#e74c3c';
+      messageEl.textContent = message;
+      pointsEl.textContent = points > 0 ? `+${points} points` : points < 0 ? `${points} points` : '';
+
+      overlay.classList.add('show');
+      feedback.classList.add('show');
+
+      setTimeout(() => {
+        overlay.classList.remove('show');
+        feedback.classList.remove('show');
+      }, 2000);
+    }
+
+    // Show hint (more limited for difficulty)
+    function showHint() {
+      if (hintsUsed >= 2) {
+        alert('No more hints available!');
+        return;
+      }
+
+      const unsolvedWords = currentPuzzle.filter(w => !w.solved);
+      if (unsolvedWords.length === 0) return;
+
+      const randomWord = unsolvedWords[Math.floor(Math.random() * unsolvedWords.length)];
+      
+      let hintText = '';
+      if (hintsUsed === 0) {
+        // First hint: just syllable count
+        const syllableCount = randomWord.syllables.length;
+        hintText = `💡 Hint: One of the remaining words has ${syllableCount} syllables.`;
+      } else {
+        // Second hint: first two letters
+        const firstTwo = randomWord.word.substring(0, 2).toUpperCase();
+        hintText = `💡 Hint: One word begins with "${firstTwo}..."`;
+      }
+
+      const hintDisplay = document.getElementById('hintDisplay');
+      hintDisplay.textContent = hintText;
+      hintDisplay.classList.add('show');
+
+      hintsUsed++;
+      score = Math.max(0, score - 15);
+      document.getElementById('score').textContent = score;
+
+      setTimeout(() => {
+        hideHint();
+      }, 6000);
+    }
+
+    // Hide hint
+    function hideHint() {
+      document.getElementById('hintDisplay').classList.remove('show');
+    }
+
+    // Shuffle syllables
+    function shuffleSyllables() {
+      allSyllables.sort(() => Math.random() - 0.5);
+      renderSyllables();
+    }
+
+    // Sort syllables alphabetically
+    function sortSyllables() {
+      allSyllables.sort((a, b) => a.text.localeCompare(b.text));
+      renderSyllables();
+    }
+
+    // Timer
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      const timerEl = document.getElementById('timer');
+      timerEl.textContent = display;
+
+      if (timeLeft <= 30) {
+        timerEl.classList.add('timer-warning');
+      } else {
+        timerEl.classList.remove('timer-warning');
+      }
+    }
+
+    // End game
+    function endGame() {
+      clearInterval(timerInterval);
+      const solvedCount = solvedWords.size;
+      const totalWords = currentPuzzle.length;
+      
+      let message = `⏰ Time's Up!\n\nFinal Score: ${score}\nWords Found: ${solvedCount}/${totalWords}\n\n`;
+      
+      if (solvedCount < totalWords) {
+        message += 'Unsolved words were:\n';
+        currentPuzzle.forEach(word => {
+          if (!word.solved) {
+            message += `• ${word.word.toUpperCase()}\n`;
+          }
+        });
+      }
+      
+      message += '\nClick "New Puzzle" to play again!';
+      alert(message);
+    }
+
+    // New game
+    function newGame() {
+      clearInterval(timerInterval);
+      score = 0;
+      timeLeft = 300;
+      hintsUsed = 0;
+      document.getElementById('score').textContent = score;
+      updateTimerDisplay();
+      generatePuzzle();
+      startTimer();
+    }
+
+    // Initialize game on page load
+    window.onload = function() {
+      generatePuzzle();
+      startTimer();
+    };
+  </script>
+</body>
+</html>
